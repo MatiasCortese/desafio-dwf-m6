@@ -8,8 +8,6 @@ import "../../components/score";
 import "../../components/star";
 import { state } from "../../state";
 
-
-
 customElements.define("welcome-page", class extends HTMLElement {
     constructor(){
         super();
