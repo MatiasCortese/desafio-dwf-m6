@@ -14,16 +14,9 @@ customElements.define("welcome-page", class extends HTMLElement {
     }
     connectedCallback(){
         this.render();
-        this.action();
     }
     render(){
         this.innerHTML = `
         <my-button>Nuevo juego</my-button>`;
-    }
-    action(){
-        const buttonEl = this.querySelector("my-button");
-        buttonEl.addEventListener("click", () => {
-            state.test();
-        })
     }
 });
