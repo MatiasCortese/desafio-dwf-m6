@@ -1,4 +1,6 @@
 {
+    "name": "desafio-m6",
+    "type": "commonjs",
     "scripts": {
         "dev:front": "parcel serve ./client/index.html",
         "dev:api": "nodemon --watch './server/index.ts' --exec 'ts-node ./server/index.ts'",
