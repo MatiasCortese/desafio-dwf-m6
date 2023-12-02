@@ -8,7 +8,7 @@ customElements.define("pres-text", class extends HTMLElement {
         const style = document.createElement("style");
         style.innerHTML = `
             .title {
-                width: 308px;
+                width: 288px;
                 color: #009048;
                 font-family: American Typewriter;
                 font-size: 80px;

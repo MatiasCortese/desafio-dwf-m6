@@ -13,7 +13,6 @@ customElements.define("score-item", class extends HTMLElement {
         const style = document.createElement("style");
         style.innerHTML = `
             .container {
-                width: 259px;
                 height: 217px;
                 border-radius: 10px;
                 border: 10px solid #000000;

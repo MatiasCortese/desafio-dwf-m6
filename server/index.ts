@@ -1,5 +1,8 @@
 import * as express from "express";
 import * as cors from "cors";
+import { firestore, rtdb } from "./db";
+import { nanoid } from "nanoid";
+import * as process from "process";
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -7,16 +10,27 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/pepe", (req, res) => {
-    res.json({
-        message: "hola soy la API pepe"
-    })
-});
+// seguir aca viendo si ya funciona la conexion a firestore y rtdb
+const roomCollection = firestore.collection("rooms");
+
+roomCollection.doc("Pepe").set({name: "test"});
 
 app.use(express.static("dist"));
 app.get("*", (req, res) => {
     res.sendFile("../" + __dirname + "/dist/index.html");
 });
+
+app.post("/pepe", (req, res) => {
+    const { name } = req.body;
+    roomCollection
+    .doc(name)
+    .set({name: "test"})
+    .then(() => {
+        res.json({
+            message: "transaction ok"
+        });
+    })
+})
 
 app.listen(port, () => console.log("conectado al puerto ", port));
 

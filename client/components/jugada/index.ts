@@ -3,21 +3,22 @@ customElements.define("move-jugada", class extends HTMLElement {
     jugada: string;
     constructor(){
         super();
-        this.shadow = this.attachShadow({mode: "open"});   
+        // this.shadow = this.attachShadow({mode: "open"});   
     }
     connectedCallback(){
         (this.jugada as any) = this.getAttribute("jugada");
         const style = document.createElement("style");
         style.innerHTML = `
             .hand {
-                width: 140px;
+                width: 60px;
+                height: 138px;
             }
 
             .hand:hover {
                 cursor: pointer;
             }
         `;
-        this.shadow.appendChild(style);
+        this.appendChild(style);
         this.render();
     }
     imgSelector(jugada: string){
@@ -32,11 +33,11 @@ customElements.define("move-jugada", class extends HTMLElement {
         }   
     }
     render(){
-        const div = document.createElement("div");
         const jugadaImg = this.imgSelector(this.jugada);
+        const div = document.createElement("div");
         div.innerHTML = `
             <img class="hand" src="${jugadaImg}">
         `;
-        this.shadow.appendChild(div);
+        this.appendChild(div);
     }
 });

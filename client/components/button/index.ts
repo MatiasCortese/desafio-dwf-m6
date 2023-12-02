@@ -18,8 +18,8 @@ customElements.define("my-button", class extends HTMLElement {
                 font-weight: 500;
                 line-height: normal;
                 letter-spacing: 2.25px;
-                width: 322px;
-                height: 87px;
+                width: 100%;
+                min-height: 87px;
                 border-radius: 10px;
                 background: #006CFC;
                 border: 10px solid #001997;

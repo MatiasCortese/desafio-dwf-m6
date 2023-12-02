@@ -586,6 +586,11 @@ parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "router", ()=>router);
 var _router = require("@vaadin/router");
 var _welcome = require("./pages/welcome");
+var _shareCode = require("./pages/share-code");
+var _instructions = require("./pages/instructions");
+var _play = require("./pages/play");
+var _ganaste = require("./pages/result/ganaste");
+var _perdiste = require("./pages/result/perdiste");
 const router = new (0, _router.Router)(document.querySelector(".root"));
 router.setRoutes([
     {
@@ -593,16 +598,33 @@ router.setRoutes([
         component: "welcome-page"
     },
     {
-        path: "/chat",
-        component: "chat-page"
+        path: "/share-code",
+        component: "share-code"
     },
+    {
+        path: "/instructions",
+        component: "instructions-page"
+    },
+    {
+        path: "/play",
+        component: "play-screen"
+    },
+    {
+        path: "/ganaste",
+        component: "win-el"
+    },
+    {
+        path: "/perdiste",
+        component: "lose-el"
+    },
+    // agregar los paths de ganaste / perdiste y ver como invocarlos desde la page de play
     {
         path: "(.*)",
         redirect: "/"
     }
 ]);
 
-},{"@vaadin/router":"kVZrF","./pages/welcome":"SIkvo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kVZrF":[function(require,module,exports) {
+},{"@vaadin/router":"kVZrF","./pages/welcome":"SIkvo","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./pages/share-code":"kXOFY","./pages/instructions":"6tSYd","./pages/play":"7u8WA","./pages/result/ganaste":"fIfZX","./pages/result/perdiste":"cNM2T"}],"kVZrF":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Resolver", ()=>Resolver);
@@ -2944,32 +2966,106 @@ var _button = require("../../components/button");
 var _presentationText = require("../../components/presentation-text");
 var _jugada = require("../../components/jugada");
 var _input = require("../../components/input");
-var _paragraphText = require("../../components/paragraph-text");
-var _countdown = require("../../components/countdown");
-var _score = require("../../components/score");
-var _star = require("../../components/star");
 var _state = require("../../state");
 customElements.define("welcome-page", class extends HTMLElement {
     constructor(){
         super();
+        this.backgroundImgUrl = require("9705b3bd7b466441");
     }
     connectedCallback() {
         this.render();
-        this.action();
+        this.addStyle();
+        this.manageOptions();
     }
     render() {
         this.innerHTML = `
-        <my-button>Nuevo juego</my-button>`;
+        <pres-text>Piedra, Papel \xf3 Tijera</pres-text>
+        <my-button class="btn" id="new-game">Nuevo juego</my-button>
+        <my-input class="btn hidden" id="enter-room-input">c\xf3digo</my-input>
+        <div id="my-name" class="my-name btn hidden">
+            <label for="my-name" class="my-name">Tu Nombre</label>
+            <my-input class="btn"  name="my-name"></my-input>
+        </div>
+        <my-button class="btn" id="enter-room-btn">Ingresar a una sala</my-button>
+        <my-button class="btn hidden" id="enter-new-room">Empezar</my-button>
+        <div class="jugadas-container">
+            <move-jugada jugada="tijera" class="jugada"></move-jugada>
+            <move-jugada jugada="piedra" class="jugada"></move-jugada>
+            <move-jugada jugada="papel" class="jugada"></move-jugada>
+        </div>`;
     }
-    action() {
-        const buttonEl = this.querySelector("my-button");
-        buttonEl.addEventListener("click", ()=>{
-            (0, _state.state).test();
+    addStyle() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .container {
+                padding: 115px 26px 26px 27px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background: url(${this.backgroundImgUrl}), lightgray 0% 0% / 29.16666567325592px 29.16666567325592px;
+                height: 85vh;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .jugadas-container {
+                display: flex;
+                gap: 46px;
+                width: 100%;
+                height: 20%;
+                align-items: center;
+                justify-content: space-evenly;
+                position: fixed;
+                bottom: -40px;
+            }
+
+            .my-name {
+                color: #000;
+                text-align: center;
+                font-family: Odibee Sans;
+                font-size: 45px;
+                font-style: normal;
+                font-weight: 400;
+                line-height: normal;
+                letter-spacing: 2.25px;
+            }
+
+            .hidden {
+                display: none;
+            }
+        `;
+        this.appendChild(style);
+        this.classList.add("container");
+    }
+    manageOptions() {
+        const enterRoomBtnEl = this.querySelector("#enter-room-btn");
+        const newGameBtnEl = this.querySelector("#new-game");
+        enterRoomBtnEl.addEventListener("click", ()=>{
+            const enterRoomCodeInputEl = document.querySelector("#enter-room-input");
+            newGameBtnEl.classList.toggle("hidden");
+            enterRoomCodeInputEl.classList.toggle("hidden");
+        // si clickeamos este boton, el btn de nuevo juego debe desaparecer y, en su lugar, aparecer el input que permita colocar el ID de una room. Por otro lado, tambien debe desaparecer el btn de Ingresar a una sala y aparecer uno que permita ingresar a la sala cuyo ID se ingresó buscandolo en la db?
+        });
+        newGameBtnEl.addEventListener("click", ()=>{
+            const inputNameEl = document.querySelector("#my-name");
+            const beginNewGameBtnEl = document.querySelector("#enter-new-room");
+            inputNameEl.classList.toggle("hidden");
+            newGameBtnEl.classList.toggle("hidden");
+            enterRoomBtnEl.classList.toggle("hidden");
+            beginNewGameBtnEl.classList.toggle("hidden");
+        // si clickeamos aqui, debe quitar los btns y colocar el input para el nombre y el boton para empezar, que debe registrar al user y crear la room en la db
+        });
+        const beginEl = this.querySelector("#enter-new-room");
+        beginEl.addEventListener("click", ()=>{
+            (0, _state.state).test("matute");
         });
     }
 });
 
-},{"../../components/button":"16XQA","../../components/presentation-text":"9Xx08","../../components/jugada":"apOUB","../../components/input":"e4GFa","../../components/paragraph-text":"lcu7B","../../components/countdown":"1vMDT","../../components/score":"1kike","../../components/star":"8Cnvm","../../state":"4zUkS"}],"16XQA":[function(require,module,exports) {
+},{"../../components/button":"16XQA","../../components/presentation-text":"9Xx08","../../components/jugada":"apOUB","../../components/input":"e4GFa","9705b3bd7b466441":"fMKbc","../../state":"4zUkS"}],"16XQA":[function(require,module,exports) {
 customElements.define("my-button", class extends HTMLElement {
     constructor(){
         super();
@@ -2989,8 +3085,8 @@ customElements.define("my-button", class extends HTMLElement {
                 font-weight: 500;
                 line-height: normal;
                 letter-spacing: 2.25px;
-                width: 322px;
-                height: 87px;
+                width: 100%;
+                min-height: 87px;
                 border-radius: 10px;
                 background: #006CFC;
                 border: 10px solid #001997;
@@ -3019,7 +3115,7 @@ customElements.define("pres-text", class extends HTMLElement {
         const style = document.createElement("style");
         style.innerHTML = `
             .title {
-                width: 308px;
+                width: 288px;
                 color: #009048;
                 font-family: American Typewriter;
                 font-size: 80px;
@@ -3051,23 +3147,22 @@ customElements.define("pres-text", class extends HTMLElement {
 customElements.define("move-jugada", class extends HTMLElement {
     constructor(){
         super();
-        this.shadow = this.attachShadow({
-            mode: "open"
-        });
+    // this.shadow = this.attachShadow({mode: "open"});   
     }
     connectedCallback() {
         this.jugada = this.getAttribute("jugada");
         const style = document.createElement("style");
         style.innerHTML = `
             .hand {
-                width: 140px;
+                width: 60px;
+                height: 138px;
             }
 
             .hand:hover {
                 cursor: pointer;
             }
         `;
-        this.shadow.appendChild(style);
+        this.appendChild(style);
         this.render();
     }
     imgSelector(jugada) {
@@ -3076,12 +3171,12 @@ customElements.define("move-jugada", class extends HTMLElement {
         if (jugada == "tijera") return require("8a37090177f9cf0f");
     }
     render() {
-        const div = document.createElement("div");
         const jugadaImg = this.imgSelector(this.jugada);
+        const div = document.createElement("div");
         div.innerHTML = `
             <img class="hand" src="${jugadaImg}">
         `;
-        this.shadow.appendChild(div);
+        this.appendChild(div);
     }
 });
 
@@ -3140,7 +3235,7 @@ customElements.define("my-input", class extends HTMLElement {
         const style = document.createElement("style");
         style.innerHTML = `
         @import url('https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap');
-            .button {
+            .input {
                 color: #D9D9D9;
                 text-align: center;
                 font-family: 'Odibee Sans', sans-serif;
@@ -3149,8 +3244,8 @@ customElements.define("my-input", class extends HTMLElement {
                 font-weight: 500;
                 line-height: normal;
                 letter-spacing: 2.25px;
-                width: 322px;
-                height: 87px;
+                width: 353px;
+                min-height: 65px;
                 border-radius: 10px;
                 background: #FFF;
                 border: 10px solid #001997;
@@ -3159,15 +3254,162 @@ customElements.define("my-input", class extends HTMLElement {
             .button:hover {
                 cursor: pointer;
             }
+            
         `;
         this.appendChild(style);
     }
     render() {
-        this.innerHTML = `<input type="text" class="button">${this.innerText}</input>`;
+        this.innerHTML = `<input type="text" class="input" placeholder="${this.innerText}"></input>`;
     }
 });
 
-},{}],"lcu7B":[function(require,module,exports) {
+},{}],"fMKbc":[function(require,module,exports) {
+module.exports = require("6402a6d54bd18cf1").getBundleURL("2V0GK") + "fondo.e1e44fc4.jpg" + "?" + Date.now();
+
+},{"6402a6d54bd18cf1":"lgJ39"}],"4zUkS":[function(require,module,exports) {
+// guarda la info para compartir entre pages/componentes
+// guardar en localStorage lo necesario
+// interactuar con ls/API
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "state", ()=>state);
+const API_BASE_URL = "http://localhost:3000";
+const state = {
+    data: {},
+    listeners: [],
+    test (name) {
+        fetch(API_BASE_URL + "/pepe", {
+            // recordar que get es el metodo default, no es necesario especificarlo
+            method: "post",
+            headers: {
+                "content-type": "application/json"
+            },
+            body: JSON.stringify({
+                name: name
+            })
+        }).then((data)=>{
+            return data.json();
+        }).then((data)=>{
+            console.log(data);
+        });
+    },
+    whoWin (myPlay, opponentPlay) {
+        const ganeConTijera = myPlay == "tijera" && opponentPlay == "papel";
+        const ganeConPiedra = myPlay == "piedra" && opponentPlay == "tijera";
+        const ganeConPapel = myPlay == "papel" && opponentPlay == "piedra";
+        const perdiContraTijera = myPlay == "papel" && opponentPlay == "tijera";
+        const perdiContraPiedra = myPlay == "tijera" && opponentPlay == "piedra";
+        const perdiContraPapel = myPlay == "piedra" && opponentPlay == "papel";
+        const gane = [
+            ganeConTijera,
+            ganeConPapel,
+            ganeConPiedra
+        ].includes(true);
+        const perdi = [
+            perdiContraTijera,
+            perdiContraPapel,
+            perdiContraPiedra
+        ].includes(true);
+        if (gane) return "Gan\xe9";
+        else if (perdi) return "Perd\xed";
+        else return "Empat\xe9";
+    }
+};
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kXOFY":[function(require,module,exports) {
+var _paragraphText = require("../../components/paragraph-text");
+customElements.define("share-code", class extends HTMLElement {
+    constructor(){
+        super();
+        this.backgroundImgUrl = require("1e587c2cb0f6caf2");
+        this.playerOneName = this.playerOneName;
+        this.playerTwoName = this.playerTwoName;
+        this.playerOneScore = this.playerOneScore;
+        this.playerTwoScore = this.playerTwoScore;
+        this.roomId = this.roomId;
+    }
+    connectedCallback() {
+        this.render();
+        this.addStyle();
+    // ESTA PANTALLA TERMINA CUANDO EL STATE DETECTA QUE EN LA ROOM HAY DOS PERSONAS CONECTADAS, AHI YA PASA A LA PANTALLA DE PLAY
+    }
+    render() {
+        this.innerHTML = `
+            <div class="container">
+                <div class="flex-container">
+                    <div class="room-data">
+                        <div class="players-names">
+                            <div class="player-one">
+                                ${this.playerOneName}:${this.playerOneScore}
+                            </div>
+                            <div class="player-two">
+                                ${this.playerTwoName}:${this.playerTwoScore}
+                            </div>
+                        </div>
+                        <div class="room-id">
+                            Sala: ${this.roomId}
+                        </div>
+                    </div>
+                    <div class="share-message">
+                        <p-text>Compart\xed el c\xf3digo</p-text>
+                        <p-text>${this.roomId}</p-text>
+                        <p-text>Con tu contrincante</p-text>
+                    </div>
+                    <div class="jugadas-container">
+                        <move-jugada jugada="tijera" class="jugada"></move-jugada>
+                        <move-jugada jugada="piedra" class="jugada"></move-jugada>
+                        <move-jugada jugada="papel" class="jugada"></move-jugada>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    addStyle() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+            .container {
+                background: url(${this.backgroundImgUrl}), lightgray 0% 0% / 29.16666567325592px 29.16666567325592px;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .flex-container {
+                padding: 20px 21px 0px 20px;
+            }
+
+            .room-data {
+                display: flex;
+                justify-content: space-between;
+                color: #000;
+                gap: 25px;
+                font-family: American Typewriter;
+                font-size: 24px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 100%;
+                margin-bottom: 130px;
+            }
+
+            .jugadas-container {
+                display: flex;
+                gap: 46px;
+                width: 100%;
+                height: 20%;
+                align-items: center;
+                justify-content: center;
+                position: fixed;
+                bottom: -50px;
+            }
+
+            .player-two {
+                color: red;
+            }
+        `;
+        this.appendChild(style);
+    }
+});
+
+},{"1e587c2cb0f6caf2":"fMKbc","../../components/paragraph-text":"lcu7B"}],"lcu7B":[function(require,module,exports) {
 customElements.define("p-text", class extends HTMLElement {
     constructor(){
         super();
@@ -3194,7 +3436,288 @@ customElements.define("p-text", class extends HTMLElement {
     }
 });
 
-},{}],"1vMDT":[function(require,module,exports) {
+},{}],"6tSYd":[function(require,module,exports) {
+customElements.define("instructions-page", class extends HTMLElement {
+    constructor(){
+        super();
+        this.backgroundImgUrl = require("8f408cd59e466e32");
+        this.backgroundImgUrl = this.backgroundImgUrl;
+        this.playerOneName = this.playerOneName;
+        this.playerTwoName = this.playerTwoName;
+        this.playerOneScore = this.playerOneScore;
+        this.playerTwoScore = this.playerTwoScore;
+        this.roomId = this.roomId;
+    }
+    connectedCallback() {
+        this.render();
+        this.addStyle();
+        this.playAndCheck();
+    }
+    render() {
+        this.innerHTML = `
+            <div class="room-data">
+                <div class="players-names">
+                    <div class="player-one">
+                        ${this.playerOneName}:${this.playerOneScore}
+                    </div>
+                    <div class="player-two">
+                        ${this.playerTwoName}:${this.playerTwoScore}
+                    </div>
+                </div>
+                <div class="room-id">
+                    Sala: ${this.roomId}
+                </div>
+            </div>
+            <p class="instructions">Presion\xe1 jugar
+            y eleg\xed: piedra, papel o tijera antes de que pasen los 3 segundos.</p>
+            <my-button class="jugar">\xa1Jugar!</my-button>
+            <p-text class="p-waiting hidden">Esperando a que ${this.playerTwoName} presione \xa1Jugar!...</p-text>
+            <div class="plays-container">
+                <move-jugada jugada="tijera"></move-jugada>
+                <move-jugada jugada="piedra"></move-jugada>
+                <move-jugada jugada="papel"></move-jugada>
+            </div>
+        `;
+    }
+    addStyle() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+        .container {
+            padding: 20px 26px 0px 27px;
+            display: flex;
+            flex-direction: column;
+            justify-contnet: center;
+            align-items: center;
+            background: url(${this.backgroundImgUrl}), lightgray 0% 0% / 29.16666567325592px 29.16666567325592px;
+            width: 85%;
+            height: 97vh;
+        }
+
+        .instructions {
+            width: 317px;
+            color: #000;
+            text-align: center;
+            font-family: American Typewriter;
+            font-size: 40px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 100%; /* 40px */
+        }
+        
+        .jugar {
+            width: 100%;
+        }
+
+        .p-waiting {
+            margin-top: 197px;
+
+        }
+
+        .plays-container {
+            display: flex;
+            gap: 46px;
+            width: 100%;
+            height: 20%;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: -40px;
+        }
+
+        .room-data {
+            display: flex;
+            justify-content: space-between;
+            color: #000;
+            gap: 25px;
+            font-family: American Typewriter;
+            font-size: 20px;
+            font-style: normal;
+            font-weight: 600;
+            line-height: 100%;
+            margin-bottom: 130px;
+        }
+
+        .player-two {
+            color: red;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        `;
+        this.appendChild(style);
+        this.classList.add("container");
+    }
+    playAndCheck() {
+        const playBtnEl = document.querySelector(".jugar");
+        playBtnEl.addEventListener("click", ()=>{
+            const instructionsEl = document.querySelector(".instructions");
+            const waitingEl = document.querySelector(".p-waiting");
+            const elements = [
+                instructionsEl,
+                playBtnEl,
+                waitingEl
+            ];
+            elements.forEach((el)=>{
+                el.classList.toggle("hidden");
+            // esto deberia estar suscripto al state y chequear de alguna manera cuando el otro player tambien haya apretado jugar, puede ser una propiedad tipo playPressed = t o f, cuando ambos son true se tiene que ir a la pantalla del countdown
+            });
+        });
+    }
+});
+
+},{"8f408cd59e466e32":"fMKbc"}],"7u8WA":[function(require,module,exports) {
+var _state = require("../../state");
+var _countdown = require("../../components/countdown");
+customElements.define("play-screen", class extends HTMLElement {
+    constructor(params){
+        super();
+        this.backgroundImgUrl = require("af87829aed0ea8f0");
+        this.myMove;
+        this.params = params;
+    }
+    connectedCallback() {
+        this.render();
+        this.addStyle();
+        this.myPlay();
+        this.manageCountdown();
+    }
+    render() {
+        this.innerHTML = `
+            <my-countdown></my-countdown>
+            <div class="plays-container">
+                <move-jugada class="jugada" jugada="tijera"></move-jugada>
+                <move-jugada class="jugada" jugada="piedra"></move-jugada>
+                <move-jugada class="jugada" jugada="papel"></move-jugada>
+            </div>
+            <div class="play-screen hidden">
+            </div>;
+        `;
+    }
+    addStyle() {
+        const style = document.createElement("style");
+        style.innerHTML = `
+        .container {
+            padding: 129px 26px 0px 27px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            background: url(${this.backgroundImgUrl}), lightgray 0% 0% / 29.16666567325592px 29.16666567325592px;
+            height: 90vh;
+        }
+
+        .plays-container {
+            display: flex;
+            gap: 46px;
+            width: 100%;
+            height: 15%;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: -20px;
+
+        }
+
+        .play-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .jugada {
+            opacity: 0.5;
+        }
+
+        .hand {
+            width: 120px;
+            height: 270px;
+        }
+
+        .jugada:hover {
+            position: relative;
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        .chosen-play {
+            width: 159px;
+            height: 356px
+        }
+
+        .hidden {
+            display: none;
+        }
+    `;
+        this.appendChild(style);
+        this.classList.add("container");
+    }
+    myPlay() {
+        var myMove;
+        const playsContainerEl = this.querySelector(".plays-container");
+        playsContainerEl.querySelectorAll(".jugada").forEach((play)=>{
+            play.addEventListener("click", (e)=>{
+                const target = e.target;
+                myMove = target.closest("move-jugada").jugada;
+                this.myMove = myMove;
+            });
+        });
+    }
+    // Esto en la version ppt online se omite ya que la jugada la hace el oponente
+    // function computerPlay(){
+    //     const moves = div.querySelectorAll("[jugada]");
+    //     const jugadas: any[] = [];
+    //     moves.forEach(move => {
+    //         const jugada = move.getAttribute("jugada");
+    //         jugadas.push(jugada);
+    //     });
+    //     const jugadaRandom = jugadas[Math.floor(Math.random() * jugadas.length)];
+    //     return jugadaRandom;
+    // };
+    // VER ESTO
+    showMoves(opponentMove, myMove) {
+        const resultado = (0, _state.state).whoWin(myMove, opponentMove);
+        const opponentPlayEl = document.createElement("move-jugada");
+        const myPlay = document.createElement("move-jugada");
+        const countdownEl = this.querySelector("my-countdown");
+        const playsContainerEl = this.querySelector(".plays-container");
+        const playScreenEl = this.querySelector(".play-screen");
+        //  aca
+        var containerEl = document.querySelector(".container");
+        containerEl.style.padding = "0px";
+        countdownEl?.classList.toggle("hidden");
+        playsContainerEl?.classList.toggle("hidden");
+        playScreenEl?.classList.toggle("hidden");
+        opponentPlayEl.setAttribute("jugada", opponentMove);
+        opponentPlayEl.style.transform = "rotate(180deg)";
+        myPlay.setAttribute("jugada", myMove);
+        playScreenEl?.append(opponentPlayEl, myPlay);
+        let counter = 3;
+        const intervalId = setInterval(()=>{
+            counter--;
+            if (counter == 0) {
+                // ver bien las routes
+                if (resultado === "Gan\xe9") this.params.goTo("/result/ganaste");
+                if (resultado === "Perd\xed") this.params.goTo("/result/perdiste");
+                if (resultado === "Empat\xe9") this.params.goTo("/instructions");
+                clearInterval(intervalId);
+            }
+        }, 1000);
+    }
+    manageCountdown() {
+        const countdownEl = this.querySelector("my-countdown");
+        countdownEl?.addEventListener("countdownEnd", ()=>{
+            // Ojo aca porque la function computerPlay() ya no se usaria en ppt online. Esto deberia ser una function que checkee si el oponente jugo o no y que, si jugo, que movimiento hizo
+            // const opponentMove = computerPlay();
+            if (this.myMove == undefined) this.params.goTo("/instructions");
+        });
+    }
+});
+
+},{"af87829aed0ea8f0":"fMKbc","../../components/countdown":"1vMDT","../../state":"4zUkS"}],"1vMDT":[function(require,module,exports) {
 customElements.define("my-countdown", class extends HTMLElement {
     constructor(){
         super();
@@ -3266,10 +3789,79 @@ customElements.define("my-countdown", class extends HTMLElement {
     }
 });
 
-},{"bcd9dbdf7c65b50f":"fMKbc"}],"fMKbc":[function(require,module,exports) {
-module.exports = require("6402a6d54bd18cf1").getBundleURL("2V0GK") + "fondo.e1e44fc4.jpg" + "?" + Date.now();
+},{"bcd9dbdf7c65b50f":"fMKbc"}],"fIfZX":[function(require,module,exports) {
+var _star = require("../../../components/star");
+var _score = require("../../../components/score");
+customElements.define("win-el", class extends HTMLElement {
+    constructor(params){
+        super();
+        this.resultado = "ganaste";
+    }
+    connectedCallback() {
+        this.render();
+        const style = document.createElement("style");
+        style.innerHTML = `
+        .container {
+            padding: 115px 26px 0px 27px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #888949;
+            opacity: 0.9;
+            width: 100%;
+            height: 100vh;
+            gap: 25px;
+        }
+    `;
+        this.appendChild(style);
+        this.classList.add("container");
+    }
+    render() {
+        this.innerHTML = `
+            <star-result resultado="${this.resultado}"></star-result>
+            <score-item></score-item>
+            <my-button class="volver-welcome">Volver a jugar</my-button>
+        `;
+    }
+});
 
-},{"6402a6d54bd18cf1":"lgJ39"}],"1kike":[function(require,module,exports) {
+},{"../../../components/star":"8Cnvm","../../../components/score":"1kike"}],"8Cnvm":[function(require,module,exports) {
+customElements.define("star-result", class extends HTMLElement {
+    constructor(){
+        super();
+        this.shadow = this.attachShadow({
+            mode: "open"
+        });
+    }
+    connectedCallback() {
+        this.resultado = this.getAttribute("resultado");
+        const style = document.createElement("style");
+        style.innerHTML = `
+        `;
+        this.shadow.appendChild(style);
+        this.render();
+    }
+    imgSelector(resultado) {
+        if (resultado == "ganaste") return require("e3ce51739c9e21e2");
+        if (resultado == "perdiste") return require("3ece8a571c5b4f08");
+    }
+    render() {
+        const div = document.createElement("div");
+        const resultImgUrl = this.imgSelector(this.resultado);
+        div.innerHTML = `
+            <img src="${resultImgUrl}">
+        `;
+        this.shadow.appendChild(div);
+    }
+});
+
+},{"e3ce51739c9e21e2":"h6TUa","3ece8a571c5b4f08":"4tCJQ"}],"h6TUa":[function(require,module,exports) {
+module.exports = require("c6c387546c77ce2c").getBundleURL("2V0GK") + "ganaste.7bdb222d.png" + "?" + Date.now();
+
+},{"c6c387546c77ce2c":"lgJ39"}],"4tCJQ":[function(require,module,exports) {
+module.exports = require("bd241b7fdd6f64bf").getBundleURL("2V0GK") + "perdiste.622c5205.png" + "?" + Date.now();
+
+},{"bd241b7fdd6f64bf":"lgJ39"}],"1kike":[function(require,module,exports) {
 customElements.define("score-item", class extends HTMLElement {
     constructor(){
         super();
@@ -3284,7 +3876,6 @@ customElements.define("score-item", class extends HTMLElement {
         const style = document.createElement("style");
         style.innerHTML = `
             .container {
-                width: 259px;
                 height: 217px;
                 border-radius: 10px;
                 border: 10px solid #000000;
@@ -3335,68 +3926,42 @@ customElements.define("score-item", class extends HTMLElement {
     }
 });
 
-},{}],"8Cnvm":[function(require,module,exports) {
-customElements.define("star-result", class extends HTMLElement {
-    constructor(){
+},{}],"cNM2T":[function(require,module,exports) {
+var _star = require("../../../components/star");
+var _score = require("../../../components/score");
+customElements.define("lose-el", class extends HTMLElement {
+    constructor(params){
         super();
-        this.shadow = this.attachShadow({
-            mode: "open"
-        });
+        this.resultado = "perdiste";
     }
     connectedCallback() {
-        this.resultado = this.getAttribute("resultado");
+        this.render();
         const style = document.createElement("style");
         style.innerHTML = `
-        `;
-        this.shadow.appendChild(style);
-        this.render();
-    }
-    imgSelector(resultado) {
-        if (resultado == "ganaste") return require("e3ce51739c9e21e2");
-        if (resultado == "perdiste") return require("3ece8a571c5b4f08");
+        .container {
+            padding: 115px 26px 0px 27px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #888949;
+            opacity: 0.9;
+            width: 100%;
+            height: 100vh;
+            gap: 25px;
+        }
+    `;
+        this.appendChild(style);
+        this.classList.add("container");
     }
     render() {
-        const div = document.createElement("div");
-        const resultImgUrl = this.imgSelector(this.resultado);
-        div.innerHTML = `
-            <img src="${resultImgUrl}">
+        this.innerHTML = `
+            <star-result resultado="${this.resultado}"></star-result>
+            <score-item></score-item>
+            <my-button class="volver-welcome">Volver a jugar</my-button>
         `;
-        this.shadow.appendChild(div);
     }
 });
 
-},{"e3ce51739c9e21e2":"h6TUa","3ece8a571c5b4f08":"4tCJQ"}],"h6TUa":[function(require,module,exports) {
-module.exports = require("c6c387546c77ce2c").getBundleURL("2V0GK") + "ganaste.7bdb222d.png" + "?" + Date.now();
-
-},{"c6c387546c77ce2c":"lgJ39"}],"4tCJQ":[function(require,module,exports) {
-module.exports = require("bd241b7fdd6f64bf").getBundleURL("2V0GK") + "perdiste.622c5205.png" + "?" + Date.now();
-
-},{"bd241b7fdd6f64bf":"lgJ39"}],"4zUkS":[function(require,module,exports) {
-// guarda la info para compartir entre pages/componentes
-// guardar en localStorage lo necesario
-// interactuar con ls/API
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "state", ()=>state);
-const API_BASE_URL = "http://localhost:3000";
-const state = {
-    data: {},
-    listeners: [],
-    test () {
-        fetch(API_BASE_URL + "/pepe", {
-            // recordar que get es el metodo default, no es necesario especificarlo
-            method: "get",
-            headers: {
-                "content-type": "application/json"
-            }
-        }).then((data)=>{
-            return data.json();
-        }).then((data)=>{
-            console.log(data);
-        });
-    }
-};
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["dDYEE","jYSt7"], "jYSt7", "parcelRequire94c2")
+},{"../../../components/star":"8Cnvm","../../../components/score":"1kike"}]},["dDYEE","jYSt7"], "jYSt7", "parcelRequire94c2")
 
 //# sourceMappingURL=index.80efa6db.js.map
