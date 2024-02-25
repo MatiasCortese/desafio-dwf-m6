@@ -1,3 +1,6 @@
+import { state } from "../../state";
+import { Router } from "@vaadin/router";
+import { map } from "lodash";
 customElements.define("instructions-page", class extends HTMLElement {
     backgroundImgUrl;
     playerOneName;
@@ -5,20 +8,31 @@ customElements.define("instructions-page", class extends HTMLElement {
     playerOneScore;
     playerTwoScore;
     roomId;
+    rtdbData;
     constructor(){
         super();
         this.backgroundImgUrl = require("url:../../images/fondo.jpg");
-        this.backgroundImgUrl =  this.backgroundImgUrl;
-        this.playerOneName = this.playerOneName;
-        this.playerTwoName = this.playerTwoName;
+        this.playerOneName = state.getState().userName;
+        this.rtdbData = map(state.getState().rtdbData);
+        console.log(`Soy la data de la rtdb ${this.rtdbData}`);
         this.playerOneScore = this.playerOneScore;
         this.playerTwoScore = this.playerTwoScore;
-        this.roomId =  this.roomId;
+        this.roomId = state.getState().friendlyRoomId;
+        this.rtdbData.forEach(item => {
+            console.log(`Soy el item de los users ${item}`)
+            if (item.userName != state.getState().userName) {
+                this.playerTwoName = item.userName;
+            }
+        })
     }
-    connectedCallback(){
+    async connectedCallback(){
+        state.subscribe(()=>{
+            state.startChecker();
+        });
         this.render();
         this.addStyle();
         this.playAndCheck();
+        state.startChecker();
     }
     render(){
         this.innerHTML = `
@@ -68,7 +82,7 @@ customElements.define("instructions-page", class extends HTMLElement {
             font-size: 40px;
             font-style: normal;
             font-weight: 600;
-            line-height: 100%; /* 40px */
+
         }
         
         .jugar {
@@ -115,16 +129,29 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.appendChild(style);
         this.classList.add("container");
     }
+    // async getAndSetuserNames(){
+    //     console.log(`Ejecutandose getAndSetUserNames()`)
+    //     const rtdbData = await map(state.getState().rtdbData);
+    //     rtdbData.forEach(item => {
+    //         console.log(`${item} desde getAndSetuserNames`);
+    //         if (state.getState().userName == item.userName) {
+    //             this.playerOneName = item.userName;
+    //         } else {
+    //             this.playerTwoName = item.userName;
+    //         }
+    //     })   
+    // }
     playAndCheck(){
         const playBtnEl = document.querySelector(".jugar");
-        playBtnEl.addEventListener("click", () => {
+        playBtnEl.addEventListener("click", async () => {
             const instructionsEl = document.querySelector(".instructions");
             const waitingEl = document.querySelector(".p-waiting");
             const elements = [instructionsEl, playBtnEl, waitingEl];
             elements.forEach(el => {
-                el.classList.toggle("hidden");
-                // esto deberia estar suscripto al state y chequear de alguna manera cuando el otro player tambien haya apretado jugar, puede ser una propiedad tipo playPressed = t o f, cuando ambos son true se tiene que ir a la pantalla del countdown
+                el.classList.toggle("hidden"); 
             })
+            await state.setStart(true);
         });
-    }
+    };
+    
 });

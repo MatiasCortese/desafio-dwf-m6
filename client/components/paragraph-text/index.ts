@@ -2,6 +2,7 @@ customElements.define("p-text", class extends HTMLElement {
     text:string;
     constructor(){
         super();
+        
     }
     connectedCallback(){
         this.render();

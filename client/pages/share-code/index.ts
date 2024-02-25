@@ -1,4 +1,5 @@
 import "../../components/paragraph-text";
+import { state } from "../../state";
 
 customElements.define("share-code", class extends HTMLElement {
     backgroundImgUrl;
@@ -6,20 +7,27 @@ customElements.define("share-code", class extends HTMLElement {
     playerTwoName;
     playerOneScore;
     playerTwoScore;
-    roomId;
+    friendlyRoomId;
     constructor(){
         super();
         this.backgroundImgUrl = require("url:../../images/fondo.jpg");
-        this.playerOneName = this.playerOneName;
+        this.playerOneName = state.getState().userName;
         this.playerTwoName = this.playerTwoName;
         this.playerOneScore = this.playerOneScore;
         this.playerTwoScore = this.playerTwoScore;
-        this.roomId = this.roomId;
+        this.friendlyRoomId = this.friendlyRoomId;
     }
     connectedCallback(){
+        state.subscribe(() =>{
+            this.render();
+            this.addStyle();
+            state.onlineChecker();
+        });
+        this.friendlyRoomId = state.getState().friendlyRoomId;
         this.render();
         this.addStyle();
-        // ESTA PANTALLA TERMINA CUANDO EL STATE DETECTA QUE EN LA ROOM HAY DOS PERSONAS CONECTADAS, AHI YA PASA A LA PANTALLA DE PLAY
+        state.setOnline();
+        state.listenDatabase();
     }
     render(){
         this.innerHTML = `
@@ -35,12 +43,12 @@ customElements.define("share-code", class extends HTMLElement {
                             </div>
                         </div>
                         <div class="room-id">
-                            Sala: ${this.roomId}
+                            Sala: ${this.friendlyRoomId}
                         </div>
                     </div>
                     <div class="share-message">
                         <p-text>Compartí el código</p-text>
-                        <p-text>${this.roomId}</p-text>
+                        <p-text>${this.friendlyRoomId}</p-text>
                         <p-text>Con tu contrincante</p-text>
                     </div>
                     <div class="jugadas-container">

@@ -1,9 +1,10 @@
 import "../../../components/star";
 import "../../../components/score";
-
+import { state } from "../../../state";
+import { Router } from "@vaadin/router";
 customElements.define("lose-el", class extends HTMLElement {
     resultado;
-    constructor(params){
+    constructor(){
         super();
         this.resultado = "perdiste";
     }
@@ -16,17 +17,15 @@ customElements.define("lose-el", class extends HTMLElement {
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #888949;
+            background: #894949;
             opacity: 0.9;
             width: 100%;
             height: 100vh;
             gap: 25px;
         }
     `;
-    
         this.appendChild(style);
         this.classList.add("container");
-        
     }
     render(){
         this.innerHTML = `
@@ -35,13 +34,15 @@ customElements.define("lose-el", class extends HTMLElement {
             <my-button class="volver-welcome">Volver a jugar</my-button>
         `;
     }
-        // le pasamos params ya que en algún momento dibujamos el boton para reiniciar el juego
-        // const resultado = "ganaste";
-        // const div = document.createElement("div");
-        // div.classList.add("container");
-        // div.querySelector(".volver-welcome")?.addEventListener('click', () => {
-        //     this.params.goTo("/instructions");
-        // });
+    playAgain(){ 
+        const playAgainBtn = document.querySelector(".volver-welcome")
+        playAgainBtn.addEventListener("click", async () => {
+            await state.setStart(false);
+            // Hay que reiniciar el choice tambien
+            await state.setChoice("");
+            Router.go("/instructions");
+        })
+    };
 });
 
 

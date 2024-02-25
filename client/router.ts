@@ -6,7 +6,6 @@ import "./pages/play";
 import "./pages/result/ganaste";
 import "./pages/result/perdiste";
 
-
 const router = new Router(document.querySelector(".root"));
 router.setRoutes([
     {path: "/", component: "welcome-page"},

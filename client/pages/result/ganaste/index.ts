@@ -1,8 +1,10 @@
 import "../../../components/star";
 import "../../../components/score";
+import { state } from "../../../state";
+import { Router } from "@vaadin/router";
 customElements.define("win-el", class extends HTMLElement {
     resultado;
-    constructor(params){
+    constructor(){
         super();
         this.resultado = "ganaste";
     }
@@ -22,10 +24,9 @@ customElements.define("win-el", class extends HTMLElement {
             gap: 25px;
         }
     `;
-    
         this.appendChild(style);
         this.classList.add("container");
-        
+        this.playAgain();
     }
     render(){
         this.innerHTML = `
@@ -34,13 +35,15 @@ customElements.define("win-el", class extends HTMLElement {
             <my-button class="volver-welcome">Volver a jugar</my-button>
         `;
     }
-        // le pasamos params ya que en algún momento dibujamos el boton para reiniciar el juego
-        // const resultado = "ganaste";
-        // const div = document.createElement("div");
-        // div.classList.add("container");
-        // div.querySelector(".volver-welcome")?.addEventListener('click', () => {
-        //     this.params.goTo("/instructions");
-        // });
+    playAgain(){ 
+        const playAgainBtn = document.querySelector(".volver-welcome");
+        playAgainBtn.addEventListener("click", async () => {
+            await state.setStart(false);
+            await state.setChoice("");
+            console.log("por ir a instructions")
+            Router.go("/instructions");
+        })
+    };
 });
 
 

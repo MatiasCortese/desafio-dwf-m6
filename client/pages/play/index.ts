@@ -1,21 +1,26 @@
 import { state } from "../../state";
 import "../../components/countdown";
+import { Router } from "@vaadin/router";
+import { map } from "lodash";
 
 customElements.define("play-screen", class extends HTMLElement {
     backgroundImgUrl;
-    myMove;
-    params;
-    constructor(params){
+    userName;
+    choice;
+    opponentChoice;
+    rtdbData;
+    constructor(){
         super();
         this.backgroundImgUrl = require("url:../../images/fondo.jpg");
-        this.myMove;
-        this.params = params;
+        this.rtdbData = this.rtdbData;
+        this.userName = this.userName;
     }
     connectedCallback(){
         this.render();
         this.addStyle();
         this.myPlay();
         this.manageCountdown();
+        this.userName = state.getState().userName;
     }
     render(){
         this.innerHTML = `
@@ -26,7 +31,7 @@ customElements.define("play-screen", class extends HTMLElement {
                 <move-jugada class="jugada" jugada="papel"></move-jugada>
             </div>
             <div class="play-screen hidden">
-            </div>;
+            </div>
         `;
     };
     addStyle(){
@@ -90,31 +95,46 @@ customElements.define("play-screen", class extends HTMLElement {
         this.appendChild(style);
         this.classList.add("container");
     }
+    // pensar bien la logica de esta page
     myPlay(){
-        var myMove;
+        var choice;
         const playsContainerEl = this.querySelector(".plays-container");
         playsContainerEl.querySelectorAll(".jugada").forEach(play => {
+            // escuchamos el clickeo de un choice
             play.addEventListener("click", (e) => {
+                // escuchamos la rtdb
+                state.listenDatabase();
                 const target = e.target as any;
-                myMove = target.closest("move-jugada").jugada;
-                this.myMove = myMove;
+                choice = target.closest("move-jugada").jugada;
+                this.choice = choice;
+                state.setChoice(this.choice);
             })
         });
     }
-    
-    // Esto en la version ppt online se omite ya que la jugada la hace el oponente
-    // function computerPlay(){
-    //     const moves = div.querySelectorAll("[jugada]");
-    //     const jugadas: any[] = [];
-    //     moves.forEach(move => {
-    //         const jugada = move.getAttribute("jugada");
-    //         jugadas.push(jugada);
-    //     });
-    //     const jugadaRandom = jugadas[Math.floor(Math.random() * jugadas.length)];
-    //     return jugadaRandom;
-    // };
-
-    // VER ESTO
+    manageCountdown(){
+        const countdownEl = this.querySelector("my-countdown");
+        countdownEl?.addEventListener("countdownEnd", async () => {
+        const rtdbData = map(state.getState().rtdbData);
+        await rtdbData.forEach(item => {
+            if (this.userName == item.userName) {
+                this.choice = item.choice;
+            } 
+            if (this.userName != item.userName){
+                this.opponentChoice = item.choice;
+            }
+        });
+        if (["piedra", "papel", "tijera"].includes(this.choice) && ["piedra", "papel", "tijera"].includes(this.opponentChoice)) {
+            // Esto se esta guardando 2 veces en firestore ya que lo ejecutan 2 clientes
+            this.showMoves(this.opponentChoice, this.choice);
+        }
+        else {
+            console.error("Error: Las variables deben ser 'piedra', 'papel' o 'tijera'");
+            await state.setStart(false);
+            await state.setChoice("");
+            Router.go("/instructions");
+        }
+    });
+    }
     showMoves(opponentMove, myMove){
         const resultado = state.whoWin(myMove, opponentMove);
         const opponentPlayEl = document.createElement("move-jugada");
@@ -122,7 +142,6 @@ customElements.define("play-screen", class extends HTMLElement {
         const countdownEl = this.querySelector("my-countdown");
         const playsContainerEl = this.querySelector(".plays-container");
         const playScreenEl = this.querySelector(".play-screen");
-        //  aca
         var containerEl = document.querySelector(".container");
         (containerEl as HTMLElement).style.padding = "0px";
         countdownEl?.classList.toggle("hidden");
@@ -133,35 +152,28 @@ customElements.define("play-screen", class extends HTMLElement {
         myPlay.setAttribute("jugada", myMove);
         playScreenEl?.append(opponentPlayEl, myPlay);
         let counter = 3;
-        const intervalId = setInterval(() => {
+        const intervalId = setInterval(async () => {
             counter--
             if (counter == 0) {
-                // ver bien las routes
                 if (resultado === "Gané") {
-                    this.params.goTo("/result/ganaste");
+                    await state.savePlayInHistory();
+                    console.log("entre al ganè");
+                    Router.go("/ganaste");
+                    // aca lo que podemos hacer es que siempre el que gana es el que pushea el Play en el history. El que pierde no guarda nada y, como si empatamos no guardamos nada, no hace falta
                 }
                 if (resultado === "Perdí") {
-                    this.params.goTo("/result/perdiste");
+                    Router.go("/perdiste");
                 }
                 if (resultado === "Empaté") {
-                    this.params.goTo("/instructions");
+                    state.setChoice("");
+                    state.setStart(false);
+                    Router.go("/instructions");
+                    // aca hay que cambiar los start y el otro a
                 }
                 clearInterval(intervalId);
             }
         }, 1000);
     }
-    manageCountdown(){
-        const countdownEl = this.querySelector("my-countdown");
-        countdownEl?.addEventListener("countdownEnd", () => {
-        // Ojo aca porque la function computerPlay() ya no se usaria en ppt online. Esto deberia ser una function que checkee si el oponente jugo o no y que, si jugo, que movimiento hizo
-        // const opponentMove = computerPlay();
-        if (this.myMove == undefined) {
-            this.params.goTo("/instructions");
-        } else {
-            // this.showMoves(opponentMove, this.myMove);
-            // state.setMoves(myMove, opponentMove);
-        }   
-    });
-    }
+    
 });
     
