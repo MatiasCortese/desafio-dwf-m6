@@ -3705,6 +3705,7 @@ const state = {
             });
             const data = await response.json();
             cs.history = await (0, _lodash.map)(data);
+            // hacer una prueba aca imprimiendo el state y ver si trae caadaa jugada
             state.setState(cs);
         } catch (error) {
             console.log(`Error fetcheando la data del room history ${error}`);
@@ -33467,23 +33468,23 @@ customElements.define("score-item", class extends HTMLElement {
                 this.playerTwoId = otroItem.data.playerTwoId;
                 this.result = (0, _state.state).whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
                 console.log("final del forEach de history");
+                if (this.result === "Gan\xe9") {
+                    console.log("dentro del IF Gane");
+                    console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
+                    console.log(`Soy el user ID history ${this.playerOneId}`);
+                    if ((0, _state.state).getState().userId == this.playerOneId) this.myScore++;
+                    if ((0, _state.state).getState().userId == this.playerTwoId) this.opponentScore++;
+                }
+                if (this.result === "Perd\xed") {
+                    console.log("dentro del IF Perdi");
+                    console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
+                    console.log(`Soy el user ID history ${this.playerOneId}`);
+                    if ((0, _state.state).getState().userId === this.playerOneId) this.opponentScore++;
+                    if ((0, _state.state).getState().userId === this.playerTwoId) this.myScore++;
+                }
             });
         });
-        // SI EL RESULTADO ES GANE
-        if (this.result === "Gan\xe9") {
-            console.log("dentro del IF Gane");
-            console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
-            console.log(`Soy el user ID history ${this.playerOneId}`);
-            if ((0, _state.state).getState().userId == this.playerOneId) this.myScore++;
-            if ((0, _state.state).getState().userId == this.playerTwoId) this.opponentScore++;
-        }
-        if (this.result === "Perd\xed") {
-            console.log("dentro del IF Perdi");
-            console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
-            console.log(`Soy el user ID history ${this.playerOneId}`);
-            if ((0, _state.state).getState().userId === this.playerOneId) this.opponentScore++;
-            if ((0, _state.state).getState().userId === this.playerTwoId) this.myScore++;
-        }
+    // SI EL RESULTADO ES GANE
     }
 });
 
@@ -33515,6 +33516,7 @@ customElements.define("lose-el", class extends HTMLElement {
     `;
         this.appendChild(style);
         this.classList.add("container");
+        this.playAgain();
     }
     render() {
         this.innerHTML = `
@@ -33527,8 +33529,8 @@ customElements.define("lose-el", class extends HTMLElement {
         const playAgainBtn = document.querySelector(".volver-welcome");
         playAgainBtn.addEventListener("click", async ()=>{
             await (0, _state.state).setStart(false);
-            // Hay que reiniciar el choice tambien
             await (0, _state.state).setChoice("");
+            console.log("por ir a instructions");
             (0, _router.Router).go("/instructions");
         });
     }

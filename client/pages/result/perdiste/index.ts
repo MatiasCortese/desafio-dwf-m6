@@ -26,6 +26,7 @@ customElements.define("lose-el", class extends HTMLElement {
     `;
         this.appendChild(style);
         this.classList.add("container");
+        this.playAgain();
     }
     render(){
         this.innerHTML = `
@@ -38,8 +39,8 @@ customElements.define("lose-el", class extends HTMLElement {
         const playAgainBtn = document.querySelector(".volver-welcome")
         playAgainBtn.addEventListener("click", async () => {
             await state.setStart(false);
-            // Hay que reiniciar el choice tambien
             await state.setChoice("");
+            console.log("por ir a instructions")
             Router.go("/instructions");
         })
     };

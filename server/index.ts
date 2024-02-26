@@ -92,7 +92,7 @@ app.post("/rooms", async (req, res) => {
             .doc(roomId.toString())
             .set({
                 rtdbRoomId: longRoomId,
-                history: {}
+                history: []
             });
             res.json({
                 longRoomId,

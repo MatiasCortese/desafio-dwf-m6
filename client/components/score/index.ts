@@ -68,7 +68,6 @@ customElements.define("score-item", class extends HTMLElement {
     scoreCalculator(){
         this.myScore = 0;
         this.opponentScore = 0;
-        
         // este metodo tiene que leer la data de cs.history
         // recorrer el array de objetos e ir viendo como organizar la data para que se guarde en myScore y opponentScore
         const history = state.getState().history;
@@ -78,31 +77,31 @@ customElements.define("score-item", class extends HTMLElement {
                 this.playerOneId = otroItem.data.playerOneId;
                 this.playerTwoId = otroItem.data.playerTwoId;
                 this.result = state.whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
-                console.log("final del forEach de history")
+                console.log("final del forEach de history");
+                if (this.result === "Gané") {
+                    console.log("dentro del IF Gane");
+                    console.log(`Soy el user ID del state ${state.getState().userId}`)
+                    console.log(`Soy el user ID history ${this.playerOneId}`)
+                    if (state.getState().userId == this.playerOneId) {
+                        this.myScore++
+                    }
+                    if(state.getState().userId == this.playerTwoId) {
+                        this.opponentScore++
+                    }
+                }
+                if (this.result === "Perdí") {
+                    console.log("dentro del IF Perdi");
+                    console.log(`Soy el user ID del state ${state.getState().userId}`)
+                    console.log(`Soy el user ID history ${this.playerOneId}`)
+                    if(state.getState().userId === this.playerOneId) {
+                        this.opponentScore++
+                    }
+                    if(state.getState().userId === this.playerTwoId) {
+                        this.myScore++
+                    }
+                }
+                });
             })
-        });
-        // SI EL RESULTADO ES GANE
-        if (this.result === "Gané") {
-            console.log("dentro del IF Gane");
-            console.log(`Soy el user ID del state ${state.getState().userId}`)
-            console.log(`Soy el user ID history ${this.playerOneId}`)
-            if (state.getState().userId == this.playerOneId) {
-                this.myScore++
-            }
-            if(state.getState().userId == this.playerTwoId) {
-                this.opponentScore++
-            }
-        }
-        if (this.result === "Perdí") {
-            console.log("dentro del IF Perdi");
-            console.log(`Soy el user ID del state ${state.getState().userId}`)
-            console.log(`Soy el user ID history ${this.playerOneId}`)
-            if(state.getState().userId === this.playerOneId) {
-                this.opponentScore++
-            }
-            if(state.getState().userId === this.playerTwoId) {
-                this.myScore++
-            }
-        }
+            // SI EL RESULTADO ES GANE
     }
 })

@@ -431,6 +431,7 @@ const state = {
             });
             const data = await response.json();
             cs.history = await map(data);
+            // hacer una prueba aca imprimiendo el state y ver si trae caadaa jugada
             state.setState(cs);
         }
         catch (error){
