@@ -147,7 +147,7 @@ const state = {
         cs.start = status;
         try {
             const cs = this.getState();
-            const response = await fetch(API_BASE_URL + `rooms/users/${cs.userId}/start`, {
+            const response = await fetch(API_BASE_URL + `/rooms/users/${cs.userId}/start`, {
                 method: "post",
                 headers: { "Content-Type": "application/json",
                 },
@@ -174,7 +174,7 @@ const state = {
         try {
             // Una mejora seria aca chequear no solo si existe, si no tambien si ya tiene 2 players.
             const cs = this.getState();
-            const response = await fetch(`${API_BASE_URL}rooms/${friendlyRoomId}`, {
+            const response = await fetch(`${API_BASE_URL}/rooms/${friendlyRoomId}`, {
                 method: "get",
                 headers: {"content-type": "application/json"},
             });
@@ -199,7 +199,7 @@ const state = {
         try {
             const cs = this.getState();
             const friendlyRoomId = cs.friendlyRoomId;
-            const response = await fetch(`${API_BASE_URL}rooms/${friendlyRoomId}`, {
+            const response = await fetch(`${API_BASE_URL}/rooms/${friendlyRoomId}`, {
                 method: "post",
                 headers: {"content-type": "application/json"},
                 body: JSON.stringify({
