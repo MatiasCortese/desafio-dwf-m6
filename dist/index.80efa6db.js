@@ -3316,7 +3316,7 @@ var _index = require("./index");
 var _rtdb = require("./rtdb");
 var _router = require("@vaadin/router");
 var _lodash = require("lodash");
-const API_BASE_URL = "http://localhost:3000/";
+const API_BASE_URL = "http://localhost:3000";
 const state = {
     data: {
         userName: "",
@@ -3340,7 +3340,7 @@ const state = {
                 console.error(`No hay un email en el state`);
                 return;
             }
-            const response = await fetch(API_BASE_URL + "signup", {
+            const response = await fetch(API_BASE_URL + "/signup", {
                 method: "post",
                 headers: {
                     "content-type": "application/json"
@@ -3364,7 +3364,7 @@ const state = {
         try {
             console.log("Soy el async login");
             const cs = this.getState();
-            const response = await fetch(API_BASE_URL + "auth", {
+            const response = await fetch(API_BASE_URL + "/auth", {
                 method: "post",
                 headers: {
                     "content-type": "application/json"
@@ -3393,7 +3393,7 @@ const state = {
                 console.error(`No hay userId`);
                 return;
             }
-            const response = await fetch(API_BASE_URL + "rooms/", {
+            const response = await fetch(API_BASE_URL + "/rooms", {
                 method: "post",
                 headers: {
                     "content-type": "application/json"
@@ -3419,7 +3419,7 @@ const state = {
         const cs = this.getState();
         const rtdbRoomId = cs.rtdbRoomId.toString();
         //  Connection with RTDB;
-        const rtdbRef = await (0, _index.rtdb).ref((0, _rtdb.db), "rooms/" + rtdbRoomId);
+        const rtdbRef = await (0, _index.rtdb).ref((0, _rtdb.db), "/rooms/" + rtdbRoomId);
         (0, _rtdb.onValue)(rtdbRef, (snapshot)=>{
             const value = snapshot.val();
             cs.rtdbData = value.currentGame;
@@ -3432,7 +3432,7 @@ const state = {
         const cs = this.getState();
         cs.online = true;
         try {
-            const response = await fetch(API_BASE_URL + `rooms/users/${cs.userId}/online`, {
+            const response = await fetch(API_BASE_URL + `/rooms/users/${cs.userId}/online`, {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json"

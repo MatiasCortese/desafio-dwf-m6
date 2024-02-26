@@ -14,7 +14,7 @@ type Game = {
     myPlay: Jugada
 };
 
-const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3000/";
+const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3000";
 
 const state = {
     data: {
@@ -39,7 +39,7 @@ const state = {
                 console.error(`No hay un email en el state`);
                 return;
             }
-            const response = await fetch(API_BASE_URL + "signup", {
+            const response = await fetch(API_BASE_URL + "/signup", {
                 method: "post",
                 headers: { "content-type": "application/json"},
                 body: JSON.stringify({userName: userName})
@@ -62,7 +62,7 @@ const state = {
         try {
             console.log("Soy el async login")
             const cs = this.getState();
-            const response = await fetch(API_BASE_URL + "auth", {
+            const response = await fetch(API_BASE_URL + "/auth", {
                 method: "post",
                 headers: {"content-type": "application/json"},
                 body: JSON.stringify({userName: userName, userid: userId,})
@@ -89,7 +89,7 @@ const state = {
                 console.error(`No hay userId`);
                 return;
             }
-            const response = await fetch(API_BASE_URL + "rooms/", {
+            const response = await fetch(API_BASE_URL + "/rooms", {
                 method: "post",
                 headers: {"content-type": "application/json"},
                 body: JSON.stringify({userId: cs.userId, userName: cs.userName})
@@ -113,7 +113,7 @@ const state = {
         const cs = this.getState();
         const rtdbRoomId = cs.rtdbRoomId.toString();
         //  Connection with RTDB;
-        const rtdbRef = await rtdb.ref(db, "rooms/" + rtdbRoomId);
+        const rtdbRef = await rtdb.ref(db, "/rooms/" + rtdbRoomId);
         onValue(rtdbRef, (snapshot) => {
             const value = snapshot.val();
             cs.rtdbData = value.currentGame;
@@ -126,7 +126,7 @@ const state = {
         const cs = this.getState();
         cs.online = true;
         try {
-            const response = await fetch(API_BASE_URL + `rooms/users/${cs.userId}/online`, {
+            const response = await fetch(API_BASE_URL + `/rooms/users/${cs.userId}/online`, {
                 method: "post",
                 headers: { "Content-Type": "application/json"},
                 body: JSON.stringify({ friendlyRoomId: cs.friendlyRoomId})
