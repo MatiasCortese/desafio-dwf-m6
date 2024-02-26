@@ -281,7 +281,7 @@ const state = {
         cs.choice = choice;
         try {
             const cs = this.getState();
-            const response = await fetch(API_BASE_URL + `rooms/users/${cs.userId}/choice`, {
+            const response = await fetch(API_BASE_URL + `/rooms/users/${cs.userId}/choice`, {
                 method: "post",
                 headers: { "Content-Type": "application/json",
                 },
@@ -329,7 +329,7 @@ const state = {
         const cs = state.getState();
         const friendlyRoomId = cs.friendlyRoomId.toString();
         // Seguir aca y preguntarse que debira hacer esta APi y este metodo
-        fetch (API_BASE_URL + "rooms/" + friendlyRoomId, {
+        fetch (API_BASE_URL + "/rooms/" + friendlyRoomId, {
             method: "post",
             headers: {
                 "content-type": "application/json",
@@ -393,7 +393,7 @@ const state = {
         // iterar la data y obtener playerOneId, playerTwoId, playerOneChoice y playerTwoChoice para mandarla en el req.body
         try {
             // aca le pegamos a la room en Firestore
-            const response = await fetch(API_BASE_URL + `rooms/${cs.friendlyRoomId}/history`, {
+            const response = await fetch(API_BASE_URL + `/rooms/${cs.friendlyRoomId}/history`, {
                 method: "post",
                 headers: { "Content-Type": "application/json"},
                 body: JSON.stringify({ 
@@ -423,7 +423,7 @@ const state = {
         try {
             const cs = this.getState();
              // fetcheemos para ver que trae
-            const response = await fetch(`${API_BASE_URL}rooms/${cs.friendlyRoomId}/history`, {
+            const response = await fetch(`${API_BASE_URL}/rooms/${cs.friendlyRoomId}/history`, {
                 method: "get",
                 headers: {
                     "content-type":"application/json"
