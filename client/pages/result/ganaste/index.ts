@@ -40,7 +40,6 @@ customElements.define("win-el", class extends HTMLElement {
         playAgainBtn.addEventListener("click", async () => {
             await state.setStart(false);
             await state.setChoice("");
-            console.log("por ir a instructions")
             Router.go("/instructions");
         })
     };

@@ -14,12 +14,10 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.backgroundImgUrl = require("url:../../images/fondo.jpg");
         this.playerOneName = state.getState().userName;
         this.rtdbData = map(state.getState().rtdbData);
-        console.log(`Soy la data de la rtdb ${this.rtdbData}`);
         this.playerOneScore = this.playerOneScore;
         this.playerTwoScore = this.playerTwoScore;
         this.roomId = state.getState().friendlyRoomId;
         this.rtdbData.forEach(item => {
-            console.log(`Soy el item de los users ${item}`)
             if (item.userName != state.getState().userName) {
                 this.playerTwoName = item.userName;
             }
@@ -129,18 +127,6 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.appendChild(style);
         this.classList.add("container");
     }
-    // async getAndSetuserNames(){
-    //     console.log(`Ejecutandose getAndSetUserNames()`)
-    //     const rtdbData = await map(state.getState().rtdbData);
-    //     rtdbData.forEach(item => {
-    //         console.log(`${item} desde getAndSetuserNames`);
-    //         if (state.getState().userName == item.userName) {
-    //             this.playerOneName = item.userName;
-    //         } else {
-    //             this.playerTwoName = item.userName;
-    //         }
-    //     })   
-    // }
     playAndCheck(){
         const playBtnEl = document.querySelector(".jugar");
         playBtnEl.addEventListener("click", async () => {

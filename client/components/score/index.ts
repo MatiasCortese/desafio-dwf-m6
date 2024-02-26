@@ -77,11 +77,7 @@ customElements.define("score-item", class extends HTMLElement {
                 this.playerOneId = otroItem.data.playerOneId;
                 this.playerTwoId = otroItem.data.playerTwoId;
                 this.result = state.whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
-                console.log("final del forEach de history");
                 if (this.result === "Gané") {
-                    console.log("dentro del IF Gane");
-                    console.log(`Soy el user ID del state ${state.getState().userId}`)
-                    console.log(`Soy el user ID history ${this.playerOneId}`)
                     if (state.getState().userId == this.playerOneId) {
                         this.myScore++
                     }
@@ -90,9 +86,6 @@ customElements.define("score-item", class extends HTMLElement {
                     }
                 }
                 if (this.result === "Perdí") {
-                    console.log("dentro del IF Perdi");
-                    console.log(`Soy el user ID del state ${state.getState().userId}`)
-                    console.log(`Soy el user ID history ${this.playerOneId}`)
                     if(state.getState().userId === this.playerOneId) {
                         this.opponentScore++
                     }

@@ -3334,7 +3334,6 @@ const state = {
         const lastStorageState = localStorage.getItem("state");
     },
     async signIn (userName, callback) {
-        console.log("soy el async del signin");
         try {
             if (!userName) {
                 console.error(`No hay un email en el state`);
@@ -3362,7 +3361,6 @@ const state = {
     },
     async logIn (userName, userId, callback) {
         try {
-            console.log("Soy el async login");
             const cs = this.getState();
             const response = await fetch(API_BASE_URL + "/auth", {
                 method: "post",
@@ -3387,7 +3385,6 @@ const state = {
     // crea un nuevo room
     async askNewRoom (callback) {
         try {
-            console.log("desde el async askNewRoom");
             const cs = this.getState();
             if (!cs.userId) {
                 console.error(`No hay userId`);
@@ -3415,7 +3412,6 @@ const state = {
     },
     // Ejemplo de cómo mantener sincronizada nuestra RTDB con una parte de nuestro state
     async listenDatabase () {
-        console.log("dentro del listenDatabase()");
         const cs = this.getState();
         const rtdbRoomId = cs.rtdbRoomId.toString();
         //  Connection with RTDB;
@@ -3423,7 +3419,6 @@ const state = {
         (0, _rtdb.onValue)(rtdbRef, (snapshot)=>{
             const value = snapshot.val();
             cs.rtdbData = value.currentGame;
-            console.log(value);
             this.setState(cs);
         });
     },
@@ -3451,7 +3446,6 @@ const state = {
     },
     // probar por que no funciona este metodo
     async setStart (status) {
-        console.log("dentro del setStart");
         const cs = this.getState();
         cs.start = status;
         try {
@@ -3468,10 +3462,8 @@ const state = {
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
-            if (data) {
-                console.log(data);
-                state.setState(cs);
-            } else console.log("No hay datos");
+            if (data) state.setState(cs);
+            else console.log("No hay datos");
         } catch (error) {
             console.error("Error en setStart:", error);
         }
@@ -3489,7 +3481,6 @@ const state = {
             const data = await response.json();
             if (data.status === "error") console.log(`No existe un room con dicho ID`);
             if (data.rtdbRoomId) {
-                console.log("la room existe");
                 cs.friendlyRoomId = friendlyRoomId;
                 cs.rtdbRoomId = data.rtdbRoomId;
                 this.setState(cs);
@@ -3519,7 +3510,6 @@ const state = {
                 alert(data.message);
                 location.reload();
             } else {
-                console.log("Users ready para comenzar");
                 if (callback) callback();
                 return 1;
             }
@@ -3529,7 +3519,6 @@ const state = {
     },
     async onlineChecker () {
         if (location.pathname.includes("share-code")) try {
-            console.log(`entrando al online checker`);
             const rtdbData = (0, _lodash.map)(this.getState().rtdbData);
             let counter = 0;
             rtdbData.forEach((player)=>{
@@ -3547,24 +3536,20 @@ const state = {
         // aca podemos usar la data de la rtdb para chupar los nombres de los users
         // el problema debe ser esto. Queda dentro de listeners, por ende, siempre que se haga un setState posterior a esto, se va a ejecutrar, va a ver que son 2 users (counter === 2) y por eso va a ir a /play de nuevo. ESTO TIENE QUE PASAR ESTANDO SOLO EN EL INSTRUCTIONS
         if (location.pathname.includes("instructions")) try {
-            console.log(`entrando al start checker`);
             const rtdbData = (0, _lodash.map)(this.getState().rtdbData);
             let counter = 0;
             rtdbData.forEach((player)=>{
                 if (player.start === true) counter++;
                 else console.log(`Your opponen is not ready yet`);
             });
-            if (counter === 2) {
-                console.log("redireccionando desde el startChecker");
-                (0, _router.Router).go("/play");
-            } else console.log("Something went wrong!");
+            if (counter === 2) (0, _router.Router).go("/play");
+            else console.log("Something went wrong!");
         } catch (error) {
             console.error("Error en onlineChecker:", error);
         }
         else console.log("no estamos en /instructions");
     },
     async setChoice (choice) {
-        console.log("dentro del setChoice");
         const cs = this.getState();
         cs.choice = choice;
         try {
@@ -3581,17 +3566,14 @@ const state = {
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
-            if (data) {
-                console.log(data);
-                state.setState(cs);
-            } else console.log("No hay datos");
+            if (data) state.setState(cs);
+            else console.log("No hay datos");
         } catch (error) {
             console.error("Error en setStart:", error);
         }
     },
     async choicesChecker () {
         try {
-            console.log(`entrando al choice checker`);
             const rtdbData = (0, _lodash.map)(this.getState().rtdbData);
             let counter = 0;
             rtdbData.forEach((player)=>{
@@ -3625,11 +3607,9 @@ const state = {
     },
     setState (newState) {
         this.data = newState;
-        console.log(this.listeners);
         for (const cb of this.listeners)cb(newState);
         // Esto hace que halla siempre en LS un item con la ultima data
         localStorage.setItem("state", JSON.stringify(newState));
-        console.log("Soy el state, he cambiado ", this.data);
     },
     subscribe (callback) {
         this.listeners.push(callback);
@@ -3660,7 +3640,6 @@ const state = {
     },
     // este metodo debe pegarle a la API que en /rooms/:roomdId/history guarda de cada player su ID y choice. Esto va a ir creando en history objetos con cada jugada. Al mismo tiempo, luego crearemos en el componente o page result un metodo que nos permita levantar esta data para ir mostrandola
     async savePlayInHistory () {
-        console.log("dentro del savePlayInHistory");
         const cs = this.getState();
         const data = await (0, _lodash.map)(cs.rtdbData);
         const playerOneId = data[0].userId;
@@ -3684,10 +3663,8 @@ const state = {
             });
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
-            if (data) {
-                console.log(`soy la data guardada en el history ${data}`);
-                state.setState(cs);
-            } else console.log("No hay datos");
+            if (data) state.setState(cs);
+            else console.log("No hay datos");
         } catch (error) {
             console.error("Error en setStart:", error);
         }
@@ -32918,12 +32895,10 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.backgroundImgUrl = require("8f408cd59e466e32");
         this.playerOneName = (0, _state.state).getState().userName;
         this.rtdbData = (0, _lodash.map)((0, _state.state).getState().rtdbData);
-        console.log(`Soy la data de la rtdb ${this.rtdbData}`);
         this.playerOneScore = this.playerOneScore;
         this.playerTwoScore = this.playerTwoScore;
         this.roomId = (0, _state.state).getState().friendlyRoomId;
         this.rtdbData.forEach((item)=>{
-            console.log(`Soy el item de los users ${item}`);
             if (item.userName != (0, _state.state).getState().userName) this.playerTwoName = item.userName;
         });
     }
@@ -33031,18 +33006,6 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.appendChild(style);
         this.classList.add("container");
     }
-    // async getAndSetuserNames(){
-    //     console.log(`Ejecutandose getAndSetUserNames()`)
-    //     const rtdbData = await map(state.getState().rtdbData);
-    //     rtdbData.forEach(item => {
-    //         console.log(`${item} desde getAndSetuserNames`);
-    //         if (state.getState().userName == item.userName) {
-    //             this.playerOneName = item.userName;
-    //         } else {
-    //             this.playerTwoName = item.userName;
-    //         }
-    //     })   
-    // }
     playAndCheck() {
         const playBtnEl = document.querySelector(".jugar");
         playBtnEl.addEventListener("click", async ()=>{
@@ -33217,7 +33180,6 @@ customElements.define("play-screen", class extends HTMLElement {
             if (counter == 0) {
                 if (resultado === "Gan\xe9") {
                     await (0, _state.state).savePlayInHistory();
-                    console.log("entre al gan\xe8");
                     (0, _router.Router).go("/ganaste");
                 // aca lo que podemos hacer es que siempre el que gana es el que pushea el Play en el history. El que pierde no guarda nada y, como si empatamos no guardamos nada, no hace falta
                 }
@@ -33348,7 +33310,6 @@ customElements.define("win-el", class extends HTMLElement {
         playAgainBtn.addEventListener("click", async ()=>{
             await (0, _state.state).setStart(false);
             await (0, _state.state).setChoice("");
-            console.log("por ir a instructions");
             (0, _router.Router).go("/instructions");
         });
     }
@@ -33467,18 +33428,11 @@ customElements.define("score-item", class extends HTMLElement {
                 this.playerOneId = otroItem.data.playerOneId;
                 this.playerTwoId = otroItem.data.playerTwoId;
                 this.result = (0, _state.state).whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
-                console.log("final del forEach de history");
                 if (this.result === "Gan\xe9") {
-                    console.log("dentro del IF Gane");
-                    console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
-                    console.log(`Soy el user ID history ${this.playerOneId}`);
                     if ((0, _state.state).getState().userId == this.playerOneId) this.myScore++;
                     if ((0, _state.state).getState().userId == this.playerTwoId) this.opponentScore++;
                 }
                 if (this.result === "Perd\xed") {
-                    console.log("dentro del IF Perdi");
-                    console.log(`Soy el user ID del state ${(0, _state.state).getState().userId}`);
-                    console.log(`Soy el user ID history ${this.playerOneId}`);
                     if ((0, _state.state).getState().userId === this.playerOneId) this.opponentScore++;
                     if ((0, _state.state).getState().userId === this.playerTwoId) this.myScore++;
                 }
@@ -33530,7 +33484,6 @@ customElements.define("lose-el", class extends HTMLElement {
         playAgainBtn.addEventListener("click", async ()=>{
             await (0, _state.state).setStart(false);
             await (0, _state.state).setChoice("");
-            console.log("por ir a instructions");
             (0, _router.Router).go("/instructions");
         });
     }

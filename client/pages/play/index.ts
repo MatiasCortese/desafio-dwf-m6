@@ -157,7 +157,6 @@ customElements.define("play-screen", class extends HTMLElement {
             if (counter == 0) {
                 if (resultado === "Gané") {
                     await state.savePlayInHistory();
-                    console.log("entre al ganè");
                     Router.go("/ganaste");
                     // aca lo que podemos hacer es que siempre el que gana es el que pushea el Play en el history. El que pierde no guarda nada y, como si empatamos no guardamos nada, no hace falta
                 }

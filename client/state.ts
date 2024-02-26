@@ -33,7 +33,6 @@ const state = {
         const lastStorageState = localStorage.getItem("state");
     },
     async signIn(userName, callback?){
-        console.log("soy el async del signin");
         try {
             if (!userName){
                 console.error(`No hay un email en el state`);
@@ -60,7 +59,6 @@ const state = {
     },
     async logIn(userName, userId, callback?){
         try {
-            console.log("Soy el async login")
             const cs = this.getState();
             const response = await fetch(API_BASE_URL + "/auth", {
                 method: "post",
@@ -83,7 +81,6 @@ const state = {
     // crea un nuevo room
     async askNewRoom(callback?){
         try {
-            console.log("desde el async askNewRoom");
             const cs = this.getState();
             if (!cs.userId){
                 console.error(`No hay userId`);
@@ -109,7 +106,6 @@ const state = {
     },
     // Ejemplo de cómo mantener sincronizada nuestra RTDB con una parte de nuestro state
     async listenDatabase(){
-        console.log("dentro del listenDatabase()");
         const cs = this.getState();
         const rtdbRoomId = cs.rtdbRoomId.toString();
         //  Connection with RTDB;
@@ -117,7 +113,6 @@ const state = {
         onValue(rtdbRef, (snapshot) => {
             const value = snapshot.val();
             cs.rtdbData = value.currentGame;
-            console.log(value);
             this.setState(cs);
         });
     },
@@ -142,7 +137,6 @@ const state = {
     },
     // probar por que no funciona este metodo
     async setStart(status) {
-        console.log("dentro del setStart");
         const cs = this.getState();
         cs.start = status;
         try {
@@ -160,7 +154,6 @@ const state = {
             }
             const data = await response.json();
             if (data) {
-                console.log(data);
                 state.setState(cs);
             } else {
                 console.log("No hay datos");
@@ -183,7 +176,6 @@ const state = {
                 console.log(`No existe un room con dicho ID`);
             }
             if (data.rtdbRoomId) {
-                console.log("la room existe")
                 cs.friendlyRoomId = friendlyRoomId;
                 cs.rtdbRoomId = data.rtdbRoomId;
                 this.setState(cs);
@@ -212,7 +204,6 @@ const state = {
                 alert(data.message);
                 location.reload();
             } else {
-                console.log("Users ready para comenzar")
                 if (callback) callback();
                 return 1;
             }
@@ -223,7 +214,6 @@ const state = {
     async onlineChecker(){
         if(location.pathname.includes("share-code")) {
             try {
-                console.log(`entrando al online checker`);
                 const rtdbData = map(this.getState().rtdbData);
                 let counter = 0;
                 rtdbData.forEach(player => {
@@ -251,7 +241,6 @@ const state = {
         // el problema debe ser esto. Queda dentro de listeners, por ende, siempre que se haga un setState posterior a esto, se va a ejecutrar, va a ver que son 2 users (counter === 2) y por eso va a ir a /play de nuevo. ESTO TIENE QUE PASAR ESTANDO SOLO EN EL INSTRUCTIONS
         if (location.pathname.includes("instructions")) {
             try {
-                console.log(`entrando al start checker`);
                 const rtdbData = map(this.getState().rtdbData);
                 let counter = 0;
                 rtdbData.forEach(player => {
@@ -262,7 +251,6 @@ const state = {
                     }
                 });
                 if (counter === 2) {
-                    console.log("redireccionando desde el startChecker")
                     Router.go("/play");
                 } else {
                     console.log("Something went wrong!");
@@ -276,7 +264,6 @@ const state = {
         }
     },
     async setChoice(choice) {
-        console.log("dentro del setChoice");
         const cs = this.getState();
         cs.choice = choice;
         try {
@@ -294,7 +281,6 @@ const state = {
             }
             const data = await response.json();
             if (data) {
-                console.log(data);
                 state.setState(cs);
             } else {
                 console.log("No hay datos");
@@ -306,7 +292,6 @@ const state = {
     },
     async choicesChecker(){
         try {
-            console.log(`entrando al choice checker`);
             const rtdbData = map(this.getState().rtdbData);
             let counter = 0;
             rtdbData.forEach(player => {
@@ -348,13 +333,11 @@ const state = {
     },
     setState(newState){
         this.data = newState;
-        console.log(this.listeners);
         for (const cb of this.listeners){
             cb(newState);
         }
         // Esto hace que halla siempre en LS un item con la ultima data
         localStorage.setItem("state", JSON.stringify(newState));
-        console.log("Soy el state, he cambiado ", this.data);
     },
     subscribe(callback: (any) => any){
         this.listeners.push(callback);
@@ -383,7 +366,6 @@ const state = {
     },
     // este metodo debe pegarle a la API que en /rooms/:roomdId/history guarda de cada player su ID y choice. Esto va a ir creando en history objetos con cada jugada. Al mismo tiempo, luego crearemos en el componente o page result un metodo que nos permita levantar esta data para ir mostrandola
     async savePlayInHistory(){
-        console.log("dentro del savePlayInHistory");
         const cs = this.getState();
         const data = await map(cs.rtdbData);
         const playerOneId = data[0].userId;
@@ -408,7 +390,6 @@ const state = {
             }
             const data = await response.json();
             if (data) {
-                console.log(`soy la data guardada en el history ${data}`);
                 state.setState(cs);
             } else {
                 console.log("No hay datos");
