@@ -32895,8 +32895,6 @@ customElements.define("instructions-page", class extends HTMLElement {
         this.backgroundImgUrl = require("8f408cd59e466e32");
         this.playerOneName = (0, _state.state).getState().userName;
         this.rtdbData = (0, _lodash.map)((0, _state.state).getState().rtdbData);
-        this.playerOneScore = this.playerOneScore;
-        this.playerTwoScore = this.playerTwoScore;
         this.roomId = (0, _state.state).getState().friendlyRoomId;
         this.rtdbData.forEach((item)=>{
             if (item.userName != (0, _state.state).getState().userName) this.playerTwoName = item.userName;
@@ -32916,10 +32914,10 @@ customElements.define("instructions-page", class extends HTMLElement {
             <div class="room-data">
                 <div class="players-names">
                     <div class="player-one">
-                        ${this.playerOneName}:${this.playerOneScore}
+                        ${this.playerOneName}:${this.myScore}
                     </div>
                     <div class="player-two">
-                        ${this.playerTwoName}:${this.playerTwoScore}
+                        ${this.playerTwoName}:${this.opponentScore}
                     </div>
                 </div>
                 <div class="room-id">
@@ -33020,6 +33018,29 @@ customElements.define("instructions-page", class extends HTMLElement {
                 el.classList.toggle("hidden");
             });
             await (0, _state.state).setStart(true);
+        });
+    }
+    scoreCalculator() {
+        this.myScore = 0;
+        this.opponentScore = 0;
+        // este metodo tiene que leer la data de cs.history
+        // recorrer el array de objetos e ir viendo como organizar la data para que se guarde en myScore y opponentScore
+        const history = (0, _state.state).getState().history;
+        history.forEach((item)=>{
+            item.forEach((otroItem)=>{
+                // esto nos devuelve el objeto con los 4 propeidades de la jugada, ver comos seguir
+                this.playerOneId = otroItem.data.playerOneId;
+                this.playerTwoId = otroItem.data.playerTwoId;
+                this.result = (0, _state.state).whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
+                if (this.result === "Gan\xe9") {
+                    if ((0, _state.state).getState().userId == this.playerOneId) this.myScore++;
+                    if ((0, _state.state).getState().userId == this.playerTwoId) this.opponentScore++;
+                }
+                if (this.result === "Perd\xed") {
+                    if ((0, _state.state).getState().userId === this.playerOneId) this.opponentScore++;
+                    if ((0, _state.state).getState().userId === this.playerTwoId) this.myScore++;
+                }
+            });
         });
     }
 });
@@ -33438,7 +33459,6 @@ customElements.define("score-item", class extends HTMLElement {
                 }
             });
         });
-    // SI EL RESULTADO ES GANE
     }
 });
 

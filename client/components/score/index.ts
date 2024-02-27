@@ -93,8 +93,9 @@ customElements.define("score-item", class extends HTMLElement {
                         this.myScore++
                     }
                 }
-                });
-            })
-            // SI EL RESULTADO ES GANE
+            });
+        })
     }
-})
+});
+
+

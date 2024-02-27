@@ -5,17 +5,18 @@ customElements.define("instructions-page", class extends HTMLElement {
     backgroundImgUrl;
     playerOneName;
     playerTwoName;
-    playerOneScore;
-    playerTwoScore;
+    myScore: number;
+    opponentScore: number;
     roomId;
     rtdbData;
+    playerOneId;
+    playerTwoId;
+    result;
     constructor(){
         super();
         this.backgroundImgUrl = require("url:../../images/fondo.jpg");
         this.playerOneName = state.getState().userName;
         this.rtdbData = map(state.getState().rtdbData);
-        this.playerOneScore = this.playerOneScore;
-        this.playerTwoScore = this.playerTwoScore;
         this.roomId = state.getState().friendlyRoomId;
         this.rtdbData.forEach(item => {
             if (item.userName != state.getState().userName) {
@@ -37,10 +38,10 @@ customElements.define("instructions-page", class extends HTMLElement {
             <div class="room-data">
                 <div class="players-names">
                     <div class="player-one">
-                        ${this.playerOneName}:${this.playerOneScore}
+                        ${this.playerOneName}:${this.myScore}
                     </div>
                     <div class="player-two">
-                        ${this.playerTwoName}:${this.playerTwoScore}
+                        ${this.playerTwoName}:${this.opponentScore}
                     </div>
                 </div>
                 <div class="room-id">
@@ -139,5 +140,36 @@ customElements.define("instructions-page", class extends HTMLElement {
             await state.setStart(true);
         });
     };
+    scoreCalculator(){
+        this.myScore = 0;
+        this.opponentScore = 0;
+        // este metodo tiene que leer la data de cs.history
+        // recorrer el array de objetos e ir viendo como organizar la data para que se guarde en myScore y opponentScore
+        const history = state.getState().history;
+        history.forEach(item => {
+            item.forEach(otroItem => {
+                // esto nos devuelve el objeto con los 4 propeidades de la jugada, ver comos seguir
+                this.playerOneId = otroItem.data.playerOneId;
+                this.playerTwoId = otroItem.data.playerTwoId;
+                this.result = state.whoWin(otroItem.data.playerOneChoice, otroItem.data.playerTwoChoice);
+                if (this.result === "Gané") {
+                    if (state.getState().userId == this.playerOneId) {
+                        this.myScore++
+                    }
+                    if(state.getState().userId == this.playerTwoId) {
+                        this.opponentScore++
+                    }
+                }
+                if (this.result === "Perdí") {
+                    if(state.getState().userId === this.playerOneId) {
+                        this.opponentScore++
+                    }
+                    if(state.getState().userId === this.playerTwoId) {
+                        this.myScore++
+                    }
+                }
+            });
+        })
+    }
     
 });
