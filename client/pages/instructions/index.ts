@@ -28,6 +28,7 @@ customElements.define("instructions-page", class extends HTMLElement {
         state.subscribe(()=>{
             state.startChecker();
         });
+        console.log("vine a instructions")
         this.render();
         this.addStyle();
         this.playAndCheck();

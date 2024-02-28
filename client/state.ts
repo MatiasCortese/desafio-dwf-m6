@@ -239,7 +239,7 @@ const state = {
     async startChecker(){
         // aca podemos usar la data de la rtdb para chupar los nombres de los users
         // el problema debe ser esto. Queda dentro de listeners, por ende, siempre que se haga un setState posterior a esto, se va a ejecutrar, va a ver que son 2 users (counter === 2) y por eso va a ir a /play de nuevo. ESTO TIENE QUE PASAR ESTANDO SOLO EN EL INSTRUCTIONS
-        if (location.pathname.includes("instructions")) {
+        if (location.pathname.includes("instructions") || location.pathname.includes("play")) {
             try {
                 const rtdbData = map(this.getState().rtdbData);
                 let counter = 0;
@@ -250,6 +250,7 @@ const state = {
                         console.log(`Your opponen is not ready yet`);
                     }
                 });
+                // el problema está aca. Cuando empatamos, nos trae a /instructions pero inmediatamente ve que counter = 2 y redirige a /play nuevamente
                 if (counter === 2) {
                     Router.go("/play");
                 } else {

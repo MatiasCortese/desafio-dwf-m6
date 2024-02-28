@@ -165,9 +165,8 @@ customElements.define("play-screen", class extends HTMLElement {
                 }
                 if (resultado === "Empaté") {
                     state.setChoice("");
-                    state.setStart(false);
+                    await state.setStart(false);
                     Router.go("/instructions");
-                    // aca hay que cambiar los start y el otro a
                 }
                 clearInterval(intervalId);
             }
